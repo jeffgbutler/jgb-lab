@@ -1,0 +1,2 @@
+# jgb-lab
+Homelab Notes
