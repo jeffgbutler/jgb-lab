@@ -46,7 +46,8 @@ auto bond0
 iface bond0 inet manual
         bond-slaves eno1 eno2
         bond-miimon 100
-        bond-mode balance-rr
+        bond-mode active-backup
+        bond-primary eno1
 
 auto vmbr0
 iface vmbr0 inet static
