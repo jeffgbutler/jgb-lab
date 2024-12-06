@@ -1,0 +1,16 @@
+global:
+  hostname: develocity.jgb-lab.dev
+database:
+  type: embedded
+ingress:
+  enabled: true
+  ssl:
+    enabled: true
+    cert: |
+      -----BEGIN CERTIFICATE-----
+      ...
+      -----END CERTIFICATE-----
+    key: |
+      -----BEGIN PRIVATE KEY-----
+      ...
+      -----END PRIVATE KEY-----
