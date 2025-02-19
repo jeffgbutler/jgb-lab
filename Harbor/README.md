@@ -11,6 +11,10 @@ Configure network as follows:
 - Gateway: 192.168.128.1
 - DNS: 192.168.128.1
 
+```shell
+sudo apt install qemu-guest-agent
+```
+
 ## Install Docker
 
 Follow the instructions here: https://docs.docker.com/engine/install/ubuntu/
@@ -19,52 +23,55 @@ Follow post install instructions here: https://docs.docker.com/engine/install/li
 
 ## Install Harbor
 
-`sudo mkdir -p /etc/docker/certs.d/harbor.jgb-lab.dev`
+Create directory for certificates:
+```shell
+sudo mkdir -p /etc/docker/certs.d/harbor.jbcodes.net
+```
 
 Copy Harbor certificates as follows:
 
-   - /etc/letsencrypt/live/harbor.jgb-lab.dev/fullchain.pem ->  /etc/docker/certs.d/harbor.jgb-lab.dev/harbor.jgb-lab.dev.cert
-   - /etc/letsencrypt/live/harbor.jgb-lab.dev/privkey.pem -> /etc/docker/certs.d/harbor.jgb-lab.dev/harbor.jgb-lab.dev.key
+   - /etc/letsencrypt/live/harbor.jbcodes.net/fullchain.pem ->  /etc/docker/certs.d/harbor.jbcodes.net/harbor.jbcodes.net.cert
+   - /etc/letsencrypt/live/harbor.jbcodes.net/privkey.pem -> /etc/docker/certs.d/harbor.jbcodes.net/harbor.jbcodes.net.key
 
 Mac:
 
 ```shell
-sudo cat /etc/letsencrypt/live/harbor.jgb-lab.dev/fullchain.pem
+sudo cat /etc/letsencrypt/live/harbor.jbcodes.net/fullchain.pem
 ```
 
 Harbor: 
 
 ```shell
-sudo vim /etc/docker/certs.d/harbor.jgb-lab.dev/harbor.jgb-lab.dev.cert
+sudo vim /etc/docker/certs.d/harbor.jbcodes.net/harbor.jbcodes.net.cert
 ```
 
 Mac:
 
 ```shell
-sudo cat /etc/letsencrypt/live/harbor.jgb-lab.dev/privkey.pem
+sudo cat /etc/letsencrypt/live/harbor.jbcodes.net/privkey.pem
 ```
 
 Harbor:
 
 ```shell
-sudo vim /etc/docker/certs.d/harbor.jgb-lab.dev/harbor.jgb-lab.dev.key
+sudo vim /etc/docker/certs.d/harbor.jbcodes.net/harbor.jbcodes.net.key
 ```
 
 Then
 
 - `sudo mkdir /harbor /data`
 - `cd /harbor`
-- `sudo curl -sLO https://github.com/goharbor/harbor/releases/download/v2.11.2/harbor-offline-installer-v2.11.2.tgz`
-- `sudo tar xvf harbor-offline-installer-v2.11.2.tgz --strip-components=1`
+- `sudo curl -sLO https://github.com/goharbor/harbor/releases/download/v2.12.2/harbor-offline-installer-v2.12.2.tgz`
+- `sudo tar xvf harbor-offline-installer-v2.12.2.tgz --strip-components=1`
 - `sudo cp harbor.yml.tmpl harbor.yml`
 - `sudo vim harbor.yml`
 
 Set/Update the following:
 
-- hostname: harbor.jgb-lab.dev
+- hostname: harbor.jbcodes.net
 - https:
-  - certificate: /etc/docker/certs.d/harbor.jgb-lab.dev/harbor.jgb-lab.dev.cert
-  - private_key: /etc/docker/certs.d/harbor.jgb-lab.dev/harbor.jgb-lab.dev.key
+  - certificate: /etc/docker/certs.d/harbor.jbcodes.net/harbor.jbcodes.net.cert
+  - private_key: /etc/docker/certs.d/harbor.jbcodes.net/harbor.jbcodes.net.key
 
 `sudo ./install.sh --with-trivy`
 
@@ -72,8 +79,8 @@ Set/Update the following:
 
 1. Copy new certificates as follows:
 
-   - /etc/letsencrypt/live/harbor.jgb-lab.dev/fullchain.pem ->  /etc/docker/certs.d/harbor.jgb-lab.dev/harbor.jgb-lab.dev.cert
-   - /etc/letsencrypt/live/harbor.jgb-lab.dev/privkey.pem -> /etc/docker/certs.d/harbor.jgb-lab.dev.net/harbor.jgb-lab.dev.key
+   - /etc/letsencrypt/live/harbor.jbcodes.net/fullchain.pem ->  /etc/docker/certs.d/harbor.jbcodes.net/harbor.jbcodes.net.cert
+   - /etc/letsencrypt/live/harbor.jbcodes.net/privkey.pem -> /etc/docker/certs.d/harbor.jbcodes.net/harbor.jbcodes.net.key
 
 1. `cd /harbor`
 1. `docker compose down -v`
