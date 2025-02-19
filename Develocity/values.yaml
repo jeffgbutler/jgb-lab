@@ -1,16 +1,14 @@
 global:
-  hostname: develocity.jgb-lab.dev
+  hostname: develocity.jbcodes.net
 database:
   type: embedded
+objectStorage:
+  type: embedded
+  embedded:
+    storage:
+      buildCache: 
+        capacity: "100Gi"
 ingress:
   enabled: true
   ssl:
     enabled: true
-    cert: |
-      -----BEGIN CERTIFICATE-----
-      ...
-      -----END CERTIFICATE-----
-    key: |
-      -----BEGIN PRIVATE KEY-----
-      ...
-      -----END PRIVATE KEY-----

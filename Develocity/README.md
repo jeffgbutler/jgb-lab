@@ -2,7 +2,7 @@
 
 ## VM Setup
 
-Create a VM with 8 vCPU, 32GB RAM, 750 GB Disk using Ubuntu Server
+Create a VM with 8 vCPU, 32GB RAM, 750 GB Disk using Ubuntu Server. With Proxmox, make sure to set the CPU type to `host`.
 
 Configure network as follows:
 
@@ -16,7 +16,7 @@ Configure network as follows:
 sudo apt install qemu-guest-agent
 ```
 
-Shutdown, restart the VM. Reboot is not enough.
+Enable QEMU agent in the Proxmox UI, then shutdown and restart the VM. Reboot is not enough.
 
 Install Homebrew: https://brew.sh/
 
@@ -24,10 +24,6 @@ Install K9S
 
 ```shell
 brew install k9s
-```
-
-```shell
-sudo timedatectl set-timezone America/Indiana/Indianapolis
 ```
 
 Follow the instructions here: https://docs.gradle.com/develocity/helm-standalone-installation/current/
@@ -59,34 +55,41 @@ helm install \
     ge-standalone \
     gradle/gradle-enterprise-standalone \
     --values values.yaml \
-    --set-file global.license.file=./develocity.license
+    --set-file global.license.file=./develocity.license \
+    --set-file ingress.ssl.cert=./cert.pem \
+    --set-file ingress.ssl.key=./key.pem
 ```
 
 ```shell
 helm list --namespace develocity
-curl -sw \\n --fail-with-body --show-error https://develocity.jgb-lab.dev/ping
-curl -sw \\n --fail-with-body --show-error http://develocity.jgb-lab.dev/ping
+curl -sw \\n --fail-with-body --show-error https://develocity.jbcodes.net/ping
+curl -sw \\n --fail-with-body --show-error http://develocity.jbcodes.net/ping
 ```
 
 ```shell
 helm upgrade \
     --namespace develocity \
     ge-standalone gradle/gradle-enterprise-standalone \
-    --version 2024.2.5 \
+    --version 2024.3.2 \
     --reuse-values \
     --values values.yaml
 ```
 
 After install:
 
-1. Changed system password to VMware1!
-2. Created admin user jeffgbutler/VMware1!
-3. Created CI user ciuser/VMware1!
-4. Created CI user Access Key
+1. Get the default system password:
+   ```shell
+   kubectl -n develocity get secret gradle-default-system-password-secret --template={{.data.password}} | base64 --decode
+   ```
+
+2. Changed system password to VMware1!
+3. Created admin user jeffgbutler/VMware1!
+4. Created CI user ciuser/VMware1!
+5. Created CI user Access Key
 
 
 Setup a maven project:
 
 ```shell
-./mvnw com.gradle:develocity-maven-extension:1.22.2:init -Ddevelocity.url=https://develocity.jgb-lab.dev
+./mvnw com.gradle:develocity-maven-extension:1.22.2:init -Ddevelocity.url=https://develocity.jbcodes.net
 ```
