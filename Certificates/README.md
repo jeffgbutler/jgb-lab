@@ -9,6 +9,7 @@ Check to see if the Cloudflare DNS plugin for certbot is installed:
 ```shell
 source certbotenv/bin/activate
 python3 -m pip list
+python3 -m pip install --upgrade certbot-dns-cloudflare
 ```
 
 If not installed...
@@ -51,6 +52,17 @@ sudo certbot certonly \
 ## Develocity
 
 ## Gitlab
+
+Copy the new certs into /etc/gitlab/ssl:
+
+   - new /etc/letsencrypt/live/gitlab.jbcodes.net/fullchain.pem ->  /etc/gitlab/ssl/gitlab.jbcodes.net.cert
+   - new /etc/letsencrypt/live/gitlab.jbcodes.net/privkey.pem -> /etc/gitlab/ssl/gitlab.jbcodes.net.key
+
+Then:
+```shell
+sudo gitlab-ctl hup nginx
+sudo gitlab-ctl hup registry
+```
 
 ## Harbor
 
