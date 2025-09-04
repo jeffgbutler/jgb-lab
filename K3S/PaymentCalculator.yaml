@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: payment-calculator
+  name: payment-calculator
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: payment-calculator
+  template:
+    metadata:
+      labels:
+        app: payment-calculator
+    spec:
+      containers:
+      - image: jeffgbutler/payment-calculator:latest
+        name: payment-calculator
+        ports:
+        - containerPort: 8080
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-calculator
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - name: "http" 
+    port: 80
+    targetPort: 8080
+  selector:
+    app: payment-calculator
+  

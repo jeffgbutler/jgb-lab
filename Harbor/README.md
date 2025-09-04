@@ -61,8 +61,8 @@ Then
 
 - `sudo mkdir /harbor /data`
 - `cd /harbor`
-- `sudo curl -sLO https://github.com/goharbor/harbor/releases/download/v2.12.2/harbor-offline-installer-v2.12.2.tgz`
-- `sudo tar xvf harbor-offline-installer-v2.12.2.tgz --strip-components=1`
+- `sudo curl -sLO https://github.com/goharbor/harbor/releases/download/v2.13.1/harbor-offline-installer-v2.13.1.tgz`
+- `sudo tar xvf harbor-offline-installer-v2.13.1.tgz --strip-components=1`
 - `sudo cp harbor.yml.tmpl harbor.yml`
 - `sudo vim harbor.yml`
 
