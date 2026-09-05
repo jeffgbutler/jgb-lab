@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: refinery-rules
+  namespace: refinery
+data:
+  rules.yaml: |
+    RulesVersion: 2
+    Samplers:
+      __default__:
+        DeterministicSampler:
+          SampleRate: 1

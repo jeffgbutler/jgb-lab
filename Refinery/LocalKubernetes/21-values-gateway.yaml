@@ -1,0 +1,77 @@
+# Deploy as a scalable deployment
+mode: deployment
+
+image:
+  repository: otel/opentelemetry-collector-k8s
+
+# Start with a minimum of 3 replicas for high availability
+replicaCount: 3
+
+# Gateways require more resources for batching, routing, and processing
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 200m
+    memory: 512Mi
+
+# Expose an internal ClusterIP service for the Agents to talk to
+service:
+  type: ClusterIP
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+  processors:
+    memory_limiter:
+      check_interval: 1s
+      limit_percentage: 80
+      spike_limit_percentage: 20
+    batch:
+      send_batch_size: 10000
+      timeout: 1s
+
+  exporters:
+    # This is where the Gateway sends data to your final observability backend
+    otlp_grpc/refinery:
+      endpoint: "refinery.refinery.svc.cluster.local:4317"
+      tls:
+        insecure: true
+      headers:
+        "x-honeycomb-team": "${env:HONEYCOMB_TEAM}"
+    otlp_grpc/honeycomb:
+      endpoint: "https://api.honeycomb.io:443"
+      tls:
+        insecure: false
+      headers:
+        "x-honeycomb-team": "${env:HONEYCOMB_TEAM}"
+
+  service:
+    pipelines:
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, batch]
+        exporters: [otlp_grpc/refinery]
+      metrics:
+        receivers: [otlp]
+        processors: [memory_limiter, batch]
+        exporters: [otlp_grpc/honeycomb]
+      logs:
+        receivers: [otlp]
+        processors: [memory_limiter, batch]
+        exporters: [otlp_grpc/refinery]
+
+
+extraEnvs:
+  - name: HONEYCOMB_TEAM
+    valueFrom:
+      secretKeyRef:
+        name: collector-secrets
+        key: HONEYCOMB_TEAM

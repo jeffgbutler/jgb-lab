@@ -1,0 +1,69 @@
+# Deploy to every node in the cluster
+mode: daemonset
+
+image:
+  repository: otel/opentelemetry-collector-k8s
+
+# Agents should be lightweight
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# The Helm chart includes presets that automatically configure 
+# receivers for Kubernetes node metrics and container logs
+presets:
+  hostMetrics:
+    enabled: true
+  kubernetesAttributes:
+    enabled: true
+  logsCollection:
+    enabled: true
+
+config:
+  receivers:
+    # Receives data from application pods running on the same node
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+  processors:
+    memory_limiter:
+      check_interval: 1s
+      limit_percentage: 75
+      spike_limit_percentage: 15
+    batch:
+      send_batch_size: 1000
+      timeout: 10s
+    resourcedetection/system:
+      detectors: [system, env, eks, gcp, azure]
+      timeout: 2s
+      override: false
+
+  exporters:
+    # CRITICAL: This points to the Gateway's ClusterIP service
+    # Format: <helm-release-name>-opentelemetry-collector.<namespace>.svc.cluster.local:4317
+    otlp_grpc:
+      endpoint: "gateway-opentelemetry-collector.collector.svc.cluster.local:4317"
+      tls:
+        insecure: true # Internal cluster traffic, TLS optional
+
+  service:
+    pipelines:
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, resourcedetection/system, k8s_attributes, batch]
+        exporters: [otlp_grpc]
+      metrics:
+        # Note the addition of the 'hostmetrics' receiver enabled by the preset
+        receivers: [otlp, hostmetrics] 
+        processors: [memory_limiter, resourcedetection/system, k8s_attributes, batch]
+        exporters: [otlp_grpc]
+      logs:
+        # Note the addition of the 'filelog' receiver enabled by the preset
+        receivers: [otlp, file_log]
+        processors: [memory_limiter, resourcedetection/system, k8s_attributes, batch]
+        exporters: [otlp_grpc]

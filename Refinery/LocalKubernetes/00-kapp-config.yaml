@@ -1,0 +1,50 @@
+apiVersion: kapp.k14s.io/v1alpha1
+kind: Config
+metadata:
+  name: deploy-ordering
+
+# Deployment order: refinery, then the collector gateway, then the collector
+# agent and the demo application together (neither depends on the other).
+#
+# Only the workload resources are ordered, on purpose.
+#
+# ConfigMaps/Secrets/ServiceAccounts: kapp's built-in "pod-related" group makes
+# every workload wait for all of them cluster-wide. Adding them here would make
+# that built-in rule cyclical, and because it is declared "ignoreIfCyclical" kapp
+# would quietly drop it rather than fail -- workloads could then be applied
+# before their own config.
+#
+# Services: the refinery and gateway Services are ClusterIP, so there is nothing
+# to wait for, and kapp already applies them alongside the first wave of
+# workloads -- before any of the workloads ordered below. Ordering them would
+# only delay them. The demo application's Service is a LoadBalancer, which kapp
+# would additionally wait on for ingress provisioning.
+#
+# Only refinery and the gateway need change groups: they are the only two
+# anything else waits on.
+
+changeGroupBindings:
+- name: demo/refinery
+  resourceMatchers:
+  - kindNamespaceNameMatcher: {kind: Deployment, namespace: refinery, name: refinery}
+  - kindNamespaceNameMatcher: {kind: Deployment, namespace: refinery, name: refinery-redis}
+
+- name: demo/gateway
+  resourceMatchers: &gatewayMatchers
+  - kindNamespaceNameMatcher: {kind: Deployment, namespace: collector, name: gateway-opentelemetry-collector}
+
+changeRuleBindings:
+# The gateway waits for refinery.
+- rules:
+  - "upsert after upserting demo/refinery"
+  - "delete before deleting demo/refinery"
+  resourceMatchers: *gatewayMatchers
+
+# The agent and the demo application both wait for the gateway, and for nothing
+# else -- so they roll out in parallel.
+- rules:
+  - "upsert after upserting demo/gateway"
+  - "delete before deleting demo/gateway"
+  resourceMatchers:
+  - kindNamespaceNameMatcher: {kind: DaemonSet, namespace: collector, name: agent-opentelemetry-collector-agent}
+  - kindNamespaceNameMatcher: {kind: Deployment, namespace: tx-simulator, name: mastercard-demo}

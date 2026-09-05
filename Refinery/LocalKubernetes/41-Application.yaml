@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mastercard-demo
+  namespace: tx-simulator
+  labels:
+    app: mastercard-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mastercard-demo
+  template:
+    metadata:
+      labels:
+        app: mastercard-demo
+    spec:
+      containers:
+        - name: mastercard-demo
+          image: mastercard-txn-simulator:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: mastercard-demo-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mastercard-demo
+  namespace: tx-simulator
+spec:
+  selector:
+    app: mastercard-demo
+  type: LoadBalancer
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9090
+      targetPort: 8080

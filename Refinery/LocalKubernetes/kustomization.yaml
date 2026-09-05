@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - 01-NameSpaces.yaml
+  - 02-Secrets.yaml
+  - 11-RulesConfigMap.yaml
+  - 41-Application.yaml
+
+helmCharts:
+  - name: refinery
+    repo: https://honeycombio.github.io/helm-charts
+    # version: 1.2.3
+    releaseName: refinery
+    namespace: refinery
+    valuesFile: 12-refinery-values.yaml
+
+  # Second Chart
+  - name: opentelemetry-collector
+    repo: https://open-telemetry.github.io/opentelemetry-helm-charts
+    # version: 4.5.6
+    releaseName: gateway
+    namespace: collector
+    valuesFile: 21-values-gateway.yaml
+
+  # Third Chart
+  - name: opentelemetry-collector
+    repo: https://open-telemetry.github.io/opentelemetry-helm-charts
+    # version: 7.8.9
+    releaseName: agent
+    namespace: collector
+    valuesFile: 31-values-agent.yaml
