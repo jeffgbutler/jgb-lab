@@ -1,4 +1,4 @@
-# Setup for Collector and Refinary Running in Docker Desktop
+# Setup for Collector and Refinary Running in Local Kubernetes
 
 ## Install Pre-Reqs
 

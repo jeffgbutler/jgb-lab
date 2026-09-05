@@ -10,7 +10,7 @@ resources:
 helmCharts:
   - name: refinery
     repo: https://honeycombio.github.io/helm-charts
-    # version: 1.2.3
+    # version: 3.3.0
     releaseName: refinery
     namespace: refinery
     valuesFile: 12-refinery-values.yaml
@@ -18,7 +18,7 @@ helmCharts:
   # Second Chart
   - name: opentelemetry-collector
     repo: https://open-telemetry.github.io/opentelemetry-helm-charts
-    # version: 4.5.6
+    # version: 0.172.0
     releaseName: gateway
     namespace: collector
     valuesFile: 21-values-gateway.yaml
@@ -26,7 +26,7 @@ helmCharts:
   # Third Chart
   - name: opentelemetry-collector
     repo: https://open-telemetry.github.io/opentelemetry-helm-charts
-    # version: 7.8.9
+    # version: 0.172.0
     releaseName: agent
     namespace: collector
     valuesFile: 31-values-agent.yaml
